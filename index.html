@@ -3,238 +3,250 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เกมกระดานตะลุยระบบหายใจ - สุขศึกษา ป.6</title>
+    <title>เกมตะลุยด่านผู้พิทักษ์ปอด - สุขศึกษา ป.6</title>
     
-    <!-- ดึงฟอนต์ไอติม (Itim) -->
+    <!-- ดึงฟอนต์ไอติม (Itim) สุดน่ารัก -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Itim&display=swap" rel="stylesheet">
 
     <style>
+        body, button, h2, h3, p, div {
+            font-family: 'Itim', cursive !important;
+            box-sizing: border-box;
+        }
+        
         body {
-            font-family: 'Itim', cursive;
             background: linear-gradient(135deg, #ffdee9 0%, #b5fffc 100%);
             margin: 0;
-            padding: 10px;
+            padding: 20px;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: #4a4a4a;
-        }
-
-        h2 { color: #ff6b81; margin-bottom: 5px; text-shadow: 1px 1px #fff; }
-
-        /* ตัวกระดานเกม */
-        .board {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            max-width: 500px;
-            justify-content: center;
-            margin: 15px 0;
-        }
-
-        /* ช่องแต่ละช่องบนกระดาน */
-        .cell {
-            width: 80px;
-            height: 80px;
-            background: white;
-            border: 3px solid #ffb7b2;
-            border-radius: 15px;
-            display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            font-size: 14px;
-            font-weight: bold;
-            position: relative;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            min-height: 100vh;
         }
 
-        .cell.active { border-color: #ff6b81; background: #ffe4e6; }
-
-        /* ตัวเดินของผู้เล่น */
-        .player {
-            width: 24px;
-            height: 24px;
-            background: #ff4757;
-            border-radius: 50%;
-            border: 2px solid white;
-            position: absolute;
-            bottom: 5px;
-            animation: bounce 0.5s infinite alternate;
+        .game-card {
+            background: rgba(255, 255, 255, 0.95);
+            width: 100%;
+            max-width: 480px;
+            padding: 25px;
+            border-radius: 30px;
+            border: 5px solid #ffb7b2;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
         }
 
-        @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-5px); } }
+        h2 { color: #ff6b81; font-size: 28px; margin-top: 0; }
+        p { color: #57606f; font-size: 19px; line-height: 1.5; }
 
-        /* ปุ่มควบคุม */
-        .btn {
-            background: #ff6b81;
+        .score-badge {
+            background: #ff7675;
             color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 50px;
-            font-size: 20px;
-            font-family: 'Itim', cursive;
-            cursor: pointer;
-            box-shadow: 0 4px 0 #e44d63;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 16px;
+            display: inline-block;
             margin-bottom: 10px;
         }
-        .btn:disabled { background: #ccc; box-shadow: none; cursor: not-allowed; }
 
-        /* กล่องคำถาม */
-        .quiz-card {
-            background: rgba(255, 255, 255, 0.95);
-            border: 4px solid #ffb7b2;
-            border-radius: 20px;
-            padding: 15px;
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-            display: none;
+        .avatar {
+            font-size: 70px;
+            margin: 10px 0;
+            animation: bounce 2s infinite;
         }
 
-        .choice-btn {
-            background: #e3fafc;
-            border: 2px solid #99e9f2;
-            padding: 10px;
-            width: 100%;
-            border-radius: 12px;
-            margin: 5px 0;
-            font-family: 'Itim', cursive;
-            font-size: 16px;
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .btn-choice {
+            background: #ffb7b2;
+            color: #4a4a4a;
+            border: none;
+            padding: 14px 18px;
+            margin: 8px 0;
+            border-radius: 20px;
             cursor: pointer;
+            font-size: 18px;
+            width: 100%;
+            text-align: left;
+            box-shadow: 0 4px 0 #e09d98;
+            transition: all 0.1s ease;
+            display: block;
+        }
+        .btn-choice:active {
+            transform: translateY(4px);
+            box-shadow: 0 0px 0 #e09d98;
+        }
+
+        #result-box {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 17px;
+            display: none;
             text-align: left;
         }
 
-        #result { margin-top: 10px; font-weight: bold; font-size: 16px; }
+        .btn-next {
+            background: #20bf6b;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 15px;
+            box-shadow: 0 4px 0 #10ac84;
+        }
+        .btn-next:active { transform: translateY(4px); box-shadow: 0 0px 0 #10ac84; }
     </style>
 </head>
 <body>
 
-    <h2>🫁 บอร์ดเกมตะลุยระบบหายใจ ป.6</h2>
-    <p style="margin: 0 0 10px 0;">กดปุ่มทอยเต๋าเพื่อพาน้องเม็ดเลือดแดงเดินทางกัน!</p>
+    <div class="game-card">
+        <div id="game-zone">
+            <div class="score-badge">ด่านที่ <span id="stage-num">1</span>/5 | คะแนน: <span id="score-text">0</span></div>
+            <h2 id="stage-title">🫁 ภารกิจปกป้องปอด</h2>
+            <div class="avatar" id="avatar-emoji">🫁✨</div>
+            
+            <p id="question-text">ข้อความคำถาม</p>
 
-    <button class="btn" id="dice-btn" onclick="rollDice()">🎲 ทอยลูกเต๋า</button>
-    <p id="dice-result" style="font-size: 18px; font-weight: bold; margin: 5px 0;"></p>
-
-    <!-- หน้าตากระดานเกม -->
-    <div class="board">
-        <div class="cell active" id="cell-0">🏁 START</div>
-        <div class="cell" id="cell-1">👃 จมูก</div>
-        <div class="cell" id="cell-2">🧪 หลอดลม</div>
-        <div class="cell" id="cell-3">🫁 ปอด</div>
-        <div class="cell" id="cell-4">🫧 ถุงลมปอด</div>
-        <div class="cell" id="cell-5">🏆 เส้นชัย</div>
-    </div>
-
-    <!-- กล่องคำถามสุขศึกษา -->
-    <div class="quiz-card" id="quiz-card">
-        <h3 id="quiz-title" style="color: #ff6b6b; margin-top: 0;">❓ คำถามประจำด่าน</h3>
-        <p id="question" style="text-align: left;"></p>
-        <div id="choices"></div>
-        <div id="result"></div>
+            <div id="choices-container">
+                <!-- ปุ่มช้อยส์จะถูกเปลี่ยนด้วยคอมพิวเตอร์อัติโนมัติ -->
+            </div>
+            
+            <div id="result-box"></div>
+            <button class="btn-next" id="next-btn" style="display:none;" onclick="nextStage()">ลุยด่านต่อไป ➡️</button>
+        </div>
+        
+        <!-- หน้าสรุปตอนจบเกม -->
+        <div id="end-zone" style="display:none;">
+            <h2>🎉 จบภารกิจผู้พิทักษ์ปอด!</h2>
+            <div class="avatar">🏆👑</div>
+            <p style="font-size: 22px;">นักเรียนได้คะแนนรวมทั้งหมด</p>
+            <h1 style="font-size: 60px; color: #ff6b81; margin: 10px 0;"><span id="final-score">0</span> / 5</h1>
+            <p id="evaluation-text">คำชม</p>
+            <button class="btn-next" onclick="location.reload()">เล่นใหม่อีกครั้ง 🔄</button>
+        </div>
     </div>
 
     <script>
-        let currentPos = 0;
-        const totalCells = 6;
-        const diceBtn = document.getElementById('dice-btn');
-        const diceResult = document.getElementById('dice-result');
-        const quizCard = document.getElementById('quiz-card');
-
-        // คลังคำถามสุขศึกษาประจำด่านต่างๆ
-        const quizzes = {
-            1: {
-                title: "ด่านที่ 1: จมูก (Nose)",
-                q: "ขนจมูกและน้ำเมือกในจมูก มีประโยชน์ในระบบหายใจอย่างไร?",
-                c: ["🧁 A. ช่วยให้อากาศบริสุทธิ์และดักจับฝุ่นละออง", "🍭 B. ช่วยให้จมูกมีความสวยงามกิ๊บเก๋"],
-                ans: 0,
-                feedback: "ถูกต้องจ้า! 🎉 ขนจมูกทำหน้าที่เหมือนเครื่องกรองอากาศธรรมชาติ คอยดักฝุ่นไม่ให้เข้าสู่ปอด"
+        // คลังคำถาม 5 ข้อวิชาสุขศึกษา ป.6
+        const quizData = [
+            {
+                question: "<b>ด่านที่ 1:</b> วันนี้ค่าฝุ่น PM 2.5 สูงมาก และมีคนนั่งสูบบุหรี่อยู่ใกล้ๆ นักเรียนควรทำอย่างไรดีที่สุดเพื่อเซฟระบบหายใจ?",
+                choices: ["🧁 A. เดินเข้าไปบอกให้เขาเลิกสูบตรงนั้น", "🍭 B. ใส่หน้ากากอนามัยแล้วรีบเดินหนีไปที่อื่น", "🍿 C. ใช้มืออุดจมูกแล้วยืนอยู่ที่เดิม"],
+                correct: 1,
+                feedbackOK: "ถูกต้องที่สุดเลยจ้า! 🎉 การสวมหน้ากากอนามัยและเลี่ยงควันพิษ จะช่วยปกป้องถุงลมปอดไม่ให้ถูกทำลาย",
+                feedbackNo: "ยังไม่ถูกน้า! ❌ เราต้องพาตัวเองออกจากบริเวณที่มีควันหรือฝุ่นพิษทันที มือเปล่ากรองสารพิษไม่ได้จ้า"
             },
-            2: {
-                title: "ด่านที่ 2: หลอดลม (Trachea)",
-                q: "หากเราไปยืนในบริเวณที่มีควันบุหรี่หนาแน่น จะส่งผลเสียต่อหลอดลมและปอดอย่างไร?",
-                c: ["🍿 A. ทำให้หลอดลมแข็งแรง รับแก๊สได้ดีขึ้น", "🍭 B. ทำให้ระคายเคือง ไอ จาม และถุงลมปอดถูกทำลาย"],
-                ans: 1,
-                feedback: "เก่งมากคราบบบ! 💖 ควันบุหรี่มีสารพิษที่ทำให้หลอดลมอักเสบและทำให้ปอดดำได้"
+            {
+                question: "<b>ด่านที่ 2:</b> การเลือกออกกำลังกายแบบใดที่ส่งผลดีและช่วยเพิ่มความแข็งแรงให้กับปอดและกะบังลมได้ดีที่สุด?",
+                choices: ["🍦 A. วิ่งจ๊อกกิ้ง หรือว่ายน้ำอย่างสม่ำเสมอ", "🍩 B. นั่งเล่นเกมส์แข่งความเร็วกับเพื่อน", "🍫 C. เดินช้อปปิ้งซื้อขนมในห้างสรรพสินค้า"],
+                correct: 0,
+                feedbackOK: "เก่งมาก! 🏃‍♂️ การออกกำลังกายแบบแอโรบิก (วิ่ง/ว่ายน้ำ) ช่วยเพิ่มความจุของปอดและทำให้กะบังลมแข็งแรงขึ้น",
+                feedbackNo: "แง ยังไม่ใช่นะจ๊ะ! ❌ ต้องเป็นการออกกำลังกายที่ทำให้หัวใจเต้นแรงและปอดได้ฝึกหายใจเข้า-ออกอย่างต่อเนื่องจ้า"
             },
-            3: {
-                title: "ด่านที่ 3: ปอด (Lung)",
-                q: "พฤติกรรมใดต่อไปนี้ ช่วยส่งเสริมให้ปอดของเราทำงานได้อย่างแข็งแรงที่สุด?",
-                c: ["🧁 A. ออกกำลังกายสม่ำเสมอในที่อากาศบริสุทธิ์", "🍿 B. นอนเล่นเกมในห้องที่ปิดทึบและมีฝุ่นเยอะ"],
-                ans: 0,
-                feedback: "ถูกต้องที่สุด! 🌟 การออกกำลังกายช่วยให้กล้ามเนื้อระบบหายใจแข็งแรง ปอดขยายตัวได้ดี"
+            {
+                question: "<b>ด่านที่ 3:</b> อาการใดต่อไปนี้ เป็นสัญญาณเตือนว่าระบบหายใจของคุณเริ่มผิดปกติและควรไปพบแพทย์?",
+                choices: ["🥞 A. รู้สึกง่วงนอนตอนบ่ายๆ", "🧋 B. หายใจเสียงดังฟี้ดๆ ไอเรื้อรัง และแน่นหน้าอก", "🍮 C. รู้สึกหิวข้าวก่อนเวลาอาหาร"],
+                correct: 1,
+                feedbackOK: "ใช่เลยครับ! 🩺 อาการไอเรื้อรัง แน่นหน้าอก หรือหายใจมีเสียง เป็นสัญญาณเตือนของโรคทางเดินหายใจ เช่น หอบหืด",
+                feedbackNo: "ลืมดูหรือเปล่าเอ่ย? ❌ อาการง่วงหรือหิวเป็นเรื่องปกติของร่างกาย แต่อาการไอเรื้อรังและแน่นหน้าอกต่างหากที่เป็นอันตราย!"
             },
-            4: {
-                title: "ด่านที่ 4: ถุงลมปอด (Alveoli)",
-                q: "ฝุ่น PM 2.5 มีอันตรายต่อถุงลมปอดอย่างไร?",
-                c: ["🍿 A. เข้าไปสะสมในถุงลมปอด ทำให้การแลกเปลี่ยนแก๊สแย่ลง", "🧁 B. ไม่มีอันตราย ร่างกายสามารถไอออกมาได้หมด"],
-                ans: 0,
-                feedback: "ถูกต้องครับ! 😷 PM 2.5 มีขนาดเล็กมากจนขนจมูกกรองไม่ได้ มันจะวิ่งไปอุดตันที่ถุงลมปอดโดยตรง"
+            {
+                question: "<b>ด่านที่ 4:</b> ข้อใดเป็นการปฏิบัติตนที่ถูกต้องในการดูแลรักษาระบบหายใจตามหลักสุขบัญญัติ?",
+                choices: ["🍡 A. พ่นน้ำหอมกลิ่นแรงๆ ไว้ในห้องนอนเพื่อความสดชื่น", "🍧 B. อยู่ในที่ที่อากาศบริสุทธิ์ ถ่ายเทสะดวก และไม่ใช้สิ่งของร่วมกับผู้ป่วยหวัด", "🍰 C. นำผ้าห่มไปตากแดดปีละ 1 ครั้งพอ"],
+                correct: 1,
+                feedbackOK: "ยอดเยี่ยมที่สุด! 🌟 การอยู่ในที่อากาศถ่ายเทและไม่คลุกคลีใกล้ชิดกับผู้ป่วย ช่วยลดโอกาสติดเชื้อระบบทางเดินหายใจ",
+                feedbackNo: "ยังไม่ถูกจ้า! ❌ กลิ่นน้ำหอมฉุนๆ หรือผ้าห่มที่ฝุ่นเกาะ อาจระคายเคืองระบบหายใจและทำให้เป็นภูมิแพ้ได้นะ"
+            },
+            {
+                question: "<b>ด่านที่ 5:</b> หากเพื่อนในกลุ่มมีอาการ 'อาหารติดคอ สลักอาหาร' จนหายใจไม่ออก หน้าเริ่มเขียว นักเรียนควรทำอย่างไร?",
+                choices: ["🍭 A. เอาน้ำเย็นให้เพื่อนรีบดื่มตามเข้าไปเยอะๆ", "🍿 B. ให้เพื่อนยืนก้มหน้า แล้วใช้ฝ่ามือตบแรงๆ บริเวณกึ่งกลางหลัง (ระหว่างสะบัก)", "🧁 C. ปล่อยให้เพื่อนนั่งพักเฉยๆ เดี๋ยวมันก็หลุดเอง"],
+                correct: 1,
+                feedbackOK: "ถูกต้องปลอดภัย! 👏 การตบหลังแรงๆ (Back Blows) ช่วยสร้างแรงดันดันสิ่งแปลกปลอมออกจากทางเดินหายใจได้ทันที",
+                feedbackNo: "อันตรายมากนะครู! ❌ ห้ามให้ดื่มน้ำเด็ดขาดเพราะจะยิ่งอุดกั้นทางเดินหายใจ และห้ามปล่อยทิ้งไว้เพราะอาจขาดอากาศหายใจถึงชีวิตได้"
             }
-        };
+        ];
 
-        // สรรค์สร้างตัวเดินเริ่มต้น
-        document.getElementById('cell-0').innerHTML += '<div class="player" id="player"></div>';
+        let currentStage = 0;
+        let score = 0;
 
-        function rollDice() {
-            diceBtn.disabled = true;
-            let steps = Math.floor(Math.random() * 2) + 1; // สุ่มเดิน 1-2 ช่อง เพื่อไม่ให้เกมจบไวเกินไป
-            diceResult.innerText = `🎲 ทอยได้: ${steps} ช่อง`;
-            
-            // ย้ายตัวเดิน
-            document.getElementById(`cell-${currentPos}`).classList.remove('active');
-            currentPos += steps;
-            
-            if (currentPos >= totalCells - 1) {
-                currentPos = totalCells - 1;
-                document.getElementById(`cell-${currentPos}`).classList.add('active');
-                document.getElementById(`cell-${currentPos}`).appendChild(document.getElementById('player'));
-                diceResult.innerText = "🎉 ยินดีด้วย! คุณพาน้องออกซิเจนไปส่งถึงเส้นชัยอย่างปลอดภัย!";
-                quizCard.style.display = "none";
-                return;
-            }
+        function loadStage() {
+            document.getElementById('stage-num').innerText = currentStage + 1;
+            document.getElementById('score-text').innerText = score;
+            document.getElementById('question-text').innerHTML = quizData[currentStage].question;
+            document.getElementById('result-box').style.display = "none";
+            document.getElementById('next-btn').style.display = "none";
+            document.getElementById('avatar-emoji').innerHTML = "🫁✨";
 
-            document.getElementById(`cell-${currentPos}`).classList.add('active');
-            document.getElementById(`cell-${currentPos}`).appendChild(document.getElementById('player'));
+            const choicesContainer = document.getElementById('choices-container');
+            choicesContainer.innerHTML = "";
 
-            // แสดงคำถามประจำช่อง
-            showQuiz(currentPos);
-        }
-
-        function showQuiz(pos) {
-            const quiz = quizzes[pos];
-            if (!quiz) {
-                diceBtn.disabled = false;
-                return;
-            }
-            
-            quizCard.style.display = "block";
-            document.getElementById('quiz-title').innerText = quiz.title;
-            document.getElementById('question').innerText = quiz.q;
-            
-            let choicesHtml = "";
-            quiz.c.forEach((choice, index) => {
-                choicesHtml += `<button class="choice-btn" onclick="checkAnswer(${index}, ${quiz.ans})">${choice}</button>`;
+            quizData[currentStage].choices.forEach((choice, index) => {
+                const button = document.createElement('button');
+                button.className = "btn-choice";
+                button.innerHTML = choice;
+                button.onclick = () => selectAnswer(index);
+                choicesContainer.appendChild(button);
             });
-            document.getElementById('choices').innerHTML = choicesHtml;
-            document.getElementById('result').innerText = "";
         }
 
-        function checkAnswer(selected, correct) {
-            const resultDiv = document.getElementById('result');
-            if (selected === correct) {
-                resultDiv.style.color = "#2e7d32";
-                resultDiv.innerText = quizzes[currentPos].feedback;
-                // ตอบถูกให้ทอยต่อตาหน้าได้
-                diceBtn.disabled = false;
+        function selectAnswer(selectedIndex) {
+            const resultBox = document.getElementById('result-box');
+            const nextBtn = document.getElementById('next-btn');
+            const avatar = document.getElementById('avatar-emoji');
+            
+            // ปิดไม่ให้กดปุ่มช้อยส์ซ้ำหลังจากตอบแล้ว
+            const buttons = document.querySelectorAll('.btn-choice');
+            buttons.forEach(btn => btn.disabled = true);
+
+            resultBox.style.display = "block";
+            nextBtn.style.display = "inline-block";
+
+            if (selectedIndex === quizData[currentStage].correct) {
+                score++;
+                document.getElementById('score-text').innerText = score;
+                avatar.innerHTML = "🥰🎉";
+                resultBox.style.background = "#e8f5e9";
+                resultBox.style.color = "#2e7d32";
+                resultBox.innerHTML = quizData[currentStage].feedbackOK;
             } else {
-                resultDiv.style.color = "#c62828";
-                resultDiv.innerText = "แง ยังไม่ถูกน้า ลองเลือกใหม่อีกทีจ้า! ❌";
+                avatar.innerHTML = "😱❌";
+                resultBox.style.background = "#ffebee";
+                resultBox.style.color = "#c62828";
+                resultBox.innerHTML = quizData[currentStage].feedbackNo;
             }
         }
+
+        function nextStage() {
+            currentStage++;
+            if (currentStage < quizData.length) {
+                loadStage();
+            } else {
+                // จบเกม แสดงหน้าสรุป
+                document.getElementById('game-zone').style.display = "none";
+                document.getElementById('end-zone').style.display = "block";
+                document.getElementById('final-score').innerText = score;
+                
+                const evalText = document.getElementById('evaluation-text');
+                if (score === 5) {
+                    evalText.innerHTML = "🌟 ยอดเยี่ยมที่สุดเลย! หนูคือ <b>'สุดยอดผู้พิทักษ์ปอด'</b> รอบรู้และดูแลตัวเองได้ดีเยี่ยม!";
+                } else if (score >= 3) {
+                    evalText.innerHTML = "👍 เก่งมากจ้า! หนูมีความรู้ในการดูแลระบบหายใจที่ดีเลย พยายามต่อไปนะคนเก่ง";
+                } else {
+                    evalText.innerHTML = "🥺 ไม่เป็นไรน้าา ลองกลับไปทบทวนบทเรียนสุขศึกษา แล้วมาท้าทายใหม่อีกรอบนะจ๊ะ ปอดเราเราต้องดูแล!";
+                }
+            }
+        }
+
+        // เริ่มเกมครั้งแรก
+        loadStage();
     </script>
+
 </body>
 </html>
