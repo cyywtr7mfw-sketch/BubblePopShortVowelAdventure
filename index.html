@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เกมตะลุยด่านผู้พิทักษ์ปอด - สุขศึกษา ป.6</title>
+    <title>เกมกล้องหน้าผู้พิทักษ์ปอด - สุขศึกษา ป.6</title>
     
-    <!-- ดึงฟอนต์ไอติม (Itim) สุดน่ารัก -->
+    <!-- ดึงคลังโค้ดสำหรับเปิดกล้องหน้า (Face Tracking) และฟอนต์ไอติม -->
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-face-aframe.prod.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Itim&display=swap" rel="stylesheet">
@@ -15,65 +17,55 @@
             font-family: 'Itim', cursive !important;
             box-sizing: border-box;
         }
-        
+
         body {
-            background: linear-gradient(135deg, #ffdee9 0%, #b5fffc 100%);
             margin: 0;
+            overflow: hidden;
+            background: #000;
+        }
+
+        /* กล่องคำถามแบบโปร่งแสง ลอยทับบนกล้องหน้าจอ */
+        .quiz-overlay {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 450px;
+            background: rgba(255, 255, 255, 0.92);
             padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .game-card {
-            background: rgba(255, 255, 255, 0.95);
-            width: 100%;
-            max-width: 480px;
-            padding: 25px;
-            border-radius: 30px;
-            border: 5px solid #ffb7b2;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-radius: 25px;
+            border: 4px solid #ffb7b2;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
             text-align: center;
+            z-index: 9999;
         }
 
-        h2 { color: #ff6b81; font-size: 28px; margin-top: 0; }
-        p { color: #57606f; font-size: 19px; line-height: 1.5; }
+        h2 { color: #ff6b81; font-size: 24px; margin: 0 0 5px 0; }
+        p { color: #4a4a4a; font-size: 17px; line-height: 1.4; margin: 10px 0; }
 
         .score-badge {
             background: #ff7675;
             color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 16px;
+            padding: 3px 12px;
+            border-radius: 15px;
+            font-size: 14px;
             display: inline-block;
-            margin-bottom: 10px;
         }
 
-        .avatar {
-            font-size: 70px;
-            margin: 10px 0;
-            animation: bounce 2s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
-        }
-
+        /* ปุ่มช้อยส์พาสเทล */
         .btn-choice {
             background: #ffb7b2;
             color: #4a4a4a;
             border: none;
-            padding: 14px 18px;
-            margin: 8px 0;
-            border-radius: 20px;
+            padding: 12px 15px;
+            margin: 6px 0;
+            border-radius: 15px;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 17px;
             width: 100%;
             text-align: left;
             box-shadow: 0 4px 0 #e09d98;
-            transition: all 0.1s ease;
             display: block;
         }
         .btn-choice:active {
@@ -82,10 +74,10 @@
         }
 
         #result-box {
-            margin-top: 15px;
-            padding: 15px;
-            border-radius: 15px;
-            font-size: 17px;
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 12px;
+            font-size: 16px;
             display: none;
             text-align: left;
         }
@@ -94,40 +86,45 @@
             background: #20bf6b;
             color: white;
             border: none;
-            padding: 10px 25px;
+            padding: 8px 20px;
             border-radius: 50px;
-            font-size: 18px;
+            font-size: 17px;
             cursor: pointer;
-            margin-top: 15px;
+            margin-top: 10px;
             box-shadow: 0 4px 0 #10ac84;
         }
-        .btn-next:active { transform: translateY(4px); box-shadow: 0 0px 0 #10ac84; }
     </style>
 </head>
 <body>
 
-    <div class="game-card">
+    <!-- ระบบเปิดกล้องหน้าของ MindAR -->
+    <a-scene mindar-face xr-mode-ui="enabled: false" embedded>
+        <a-camera active="true" position="0 0 0" look-controls="enabled: false"></a-camera>
+        
+        <!-- คุณครูสามารถหาโมเดล 3D หน้ากาก หรือ ปอด มาแปะให้ลอยบนหน้าเด็กตรงนี้เพิ่มทีหลังได้ครับ -->
+        <a-entity mindar-face-target="anchorIndex: 168">
+            <!-- จุดนี้คือดาดฟ้าจมูก/ระหว่างคิ้ว ถ้ามีโมเดล 3D จะลอยตรงนี้ทันที -->
+        </a-entity>
+    </a-scene>
+
+    <!-- หน้าจอเกม (ลอยอยู่บนกล้องหน้า) -->
+    <div class="quiz-overlay">
         <div id="game-zone">
             <div class="score-badge">ด่านที่ <span id="stage-num">1</span>/5 | คะแนน: <span id="score-text">0</span></div>
-            <h2 id="stage-title">🫁 ภารกิจปกป้องปอด</h2>
-            <div class="avatar" id="avatar-emoji">🫁✨</div>
-            
+            <h2>📸 มองกล้องแล้วตอบคำถามกัน!</h2>
             <p id="question-text">ข้อความคำถาม</p>
 
-            <div id="choices-container">
-                <!-- ปุ่มช้อยส์จะถูกเปลี่ยนด้วยคอมพิวเตอร์อัติโนมัติ -->
-            </div>
+            <div id="choices-container"></div>
             
             <div id="result-box"></div>
-            <button class="btn-next" id="next-btn" style="display:none;" onclick="nextStage()">ลุยด่านต่อไป ➡️</button>
+            <button class="btn-next" id="next-btn" style="display:none;" onclick="nextStage()">ด่านต่อไป ➡️</button>
         </div>
-        
+
         <!-- หน้าสรุปตอนจบเกม -->
         <div id="end-zone" style="display:none;">
-            <h2>🎉 จบภารกิจผู้พิทักษ์ปอด!</h2>
-            <div class="avatar">🏆👑</div>
-            <p style="font-size: 22px;">นักเรียนได้คะแนนรวมทั้งหมด</p>
-            <h1 style="font-size: 60px; color: #ff6b81; margin: 10px 0;"><span id="final-score">0</span> / 5</h1>
+            <h2>🎉 สำเร็จภารกิจพิทักษ์ปอด!</h2>
+            <p style="font-size: 20px; margin: 0;">หนูได้คะแนนรวมทั้งหมด</p>
+            <h1 style="font-size: 50px; color: #ff6b81; margin: 5px 0;"><span id="final-score">0</span> / 5</h1>
             <p id="evaluation-text">คำชม</p>
             <button class="btn-next" onclick="location.reload()">เล่นใหม่อีกครั้ง 🔄</button>
         </div>
@@ -137,39 +134,39 @@
         // คลังคำถาม 5 ข้อวิชาสุขศึกษา ป.6
         const quizData = [
             {
-                question: "<b>ด่านที่ 1:</b> วันนี้ค่าฝุ่น PM 2.5 สูงมาก และมีคนนั่งสูบบุหรี่อยู่ใกล้ๆ นักเรียนควรทำอย่างไรดีที่สุดเพื่อเซฟระบบหายใจ?",
-                choices: ["🧁 A. เดินเข้าไปบอกให้เขาเลิกสูบตรงนั้น", "🍭 B. ใส่หน้ากากอนามัยแล้วรีบเดินหนีไปที่อื่น", "🍿 C. ใช้มืออุดจมูกแล้วยืนอยู่ที่เดิม"],
-                correct: 1,
-                feedbackOK: "ถูกต้องที่สุดเลยจ้า! 🎉 การสวมหน้ากากอนามัยและเลี่ยงควันพิษ จะช่วยปกป้องถุงลมปอดไม่ให้ถูกทำลาย",
-                feedbackNo: "ยังไม่ถูกน้า! ❌ เราต้องพาตัวเองออกจากบริเวณที่มีควันหรือฝุ่นพิษทันที มือเปล่ากรองสารพิษไม่ได้จ้า"
-            },
-            {
-                question: "<b>ด่านที่ 2:</b> การเลือกออกกำลังกายแบบใดที่ส่งผลดีและช่วยเพิ่มความแข็งแรงให้กับปอดและกะบังลมได้ดีที่สุด?",
-                choices: ["🍦 A. วิ่งจ๊อกกิ้ง หรือว่ายน้ำอย่างสม่ำเสมอ", "🍩 B. นั่งเล่นเกมส์แข่งความเร็วกับเพื่อน", "🍫 C. เดินช้อปปิ้งซื้อขนมในห้างสรรพสินค้า"],
+                question: "<b>ข้อ 1:</b> หากโรงเรียนมีค่าฝุ่น PM 2.5 สูงมาก พฤติกรรมใดเป็นการดูแลระบบหายใจที่ถูกต้องที่สุด?",
+                choices: ["🧁 A. ใส่หน้ากากอนามัย และงดเล่นกลางแจ้ง", "🍭 B. วิ่งเล่นสู้ฝุ่นเพื่อฝึกความอดทนของปอด", "🍿 C. ใช้มืออุดจมูกแล้วไปวิ่งเล่นปกติ"],
                 correct: 0,
-                feedbackOK: "เก่งมาก! 🏃‍♂️ การออกกำลังกายแบบแอโรบิก (วิ่ง/ว่ายน้ำ) ช่วยเพิ่มความจุของปอดและทำให้กะบังลมแข็งแรงขึ้น",
-                feedbackNo: "แง ยังไม่ใช่นะจ๊ะ! ❌ ต้องเป็นการออกกำลังกายที่ทำให้หัวใจเต้นแรงและปอดได้ฝึกหายใจเข้า-ออกอย่างต่อเนื่องจ้า"
+                feedbackOK: "ถูกต้องเลยครู! 🎉 หน้ากากอนามัยช่วยกรองฝุ่นจิ๋วไม่ให้ทำลายถุงลมปอดครับ",
+                feedbackNo: "ยังไม่ถูกน้า! ❌ ฝุ่น PM 2.5 เล็กมากทะลวงเข้ากระแสเลือดได้เลย ต้องหลบในอาคารและใส่แมสก์จ้า"
             },
             {
-                question: "<b>ด่านที่ 3:</b> อาการใดต่อไปนี้ เป็นสัญญาณเตือนว่าระบบหายใจของคุณเริ่มผิดปกติและควรไปพบแพทย์?",
-                choices: ["🥞 A. รู้สึกง่วงนอนตอนบ่ายๆ", "🧋 B. หายใจเสียงดังฟี้ดๆ ไอเรื้อรัง และแน่นหน้าอก", "🍮 C. รู้สึกหิวข้าวก่อนเวลาอาหาร"],
+                question: "<b>ข้อ 2:</b> หากคนในครอบครัวสูบบุหรี่ในบ้าน จะส่งผลเสียต่อปอดของนักเรียน (ผู้สูบบุหรี่มือสอง) อย่างไร?",
+                choices: ["🍦 A. ไม่เป็นไรเลยเพราะเราไม่ได้สูบเอง", "🍩 B. สารพิษจะเข้าไปทำลายถุงลมปอด เสี่ยงต่อโรคถุงลมโป่งพอง", "🍫 C. ทำให้ปอดแข็งแรงขึ้นเพราะชินกับควัน"],
                 correct: 1,
-                feedbackOK: "ใช่เลยครับ! 🩺 อาการไอเรื้อรัง แน่นหน้าอก หรือหายใจมีเสียง เป็นสัญญาณเตือนของโรคทางเดินหายใจ เช่น หอบหืด",
-                feedbackNo: "ลืมดูหรือเปล่าเอ่ย? ❌ อาการง่วงหรือหิวเป็นเรื่องปกติของร่างกาย แต่อาการไอเรื้อรังและแน่นหน้าอกต่างหากที่เป็นอันตราย!"
+                feedbackOK: "เก่งมาก! 🚬 ควันบุหรี่มือสองอันตรายมาก สารพิษทำลายปอดคนรอบข้างได้เหมือนคนสูบเองเลย",
+                feedbackNo: "ผิดเลยจ้า! ❌ ควันบุหรี่ไม่มีประโยชน์ มีแต่สารพิษที่จ้องทำลายระบบหายใจของเรานะ"
             },
             {
-                question: "<b>ด่านที่ 4:</b> ข้อใดเป็นการปฏิบัติตนที่ถูกต้องในการดูแลรักษาระบบหายใจตามหลักสุขบัญญัติ?",
-                choices: ["🍡 A. พ่นน้ำหอมกลิ่นแรงๆ ไว้ในห้องนอนเพื่อความสดชื่น", "🍧 B. อยู่ในที่ที่อากาศบริสุทธิ์ ถ่ายเทสะดวก และไม่ใช้สิ่งของร่วมกับผู้ป่วยหวัด", "🍰 C. นำผ้าห่มไปตากแดดปีละ 1 ครั้งพอ"],
+                question: "<b>ข้อ 3:</b> การออกกำลังกายสม่ำเสมอ ส่งผลดีต่อ 'ระบบหายใจ' อย่างไรมากที่สุด?",
+                choices: ["🥞 A. ทำให้ปอดเล็กลงเรื่อยๆ", "🧋 B. ช่วยเพิ่มความจุของปอด และทำให้กะบังลมแข็งแรง", "🍮 C. ทำให้เราไม่ต้องหายใจตอนนอน"],
                 correct: 1,
-                feedbackOK: "ยอดเยี่ยมที่สุด! 🌟 การอยู่ในที่อากาศถ่ายเทและไม่คลุกคลีใกล้ชิดกับผู้ป่วย ช่วยลดโอกาสติดเชื้อระบบทางเดินหายใจ",
-                feedbackNo: "ยังไม่ถูกจ้า! ❌ กลิ่นน้ำหอมฉุนๆ หรือผ้าห่มที่ฝุ่นเกาะ อาจระคายเคืองระบบหายใจและทำให้เป็นภูมิแพ้ได้นะ"
+                feedbackOK: "ใช่เลย! 🏃‍♂️ ปอดจะขยายตัวได้ดี กะบังลมแข็งแรง ทำให้ร่างกายได้รับออกซิเจนเต็มที่ครับ",
+                feedbackNo: "แง ยังไม่ใช่น้า! ❌ การออกกำลังกายทำให้ปอดทำงานมีประสิทธิภาพขึ้น ไม่ใช่ทำให้ปอดเล็กลงจ้า"
             },
             {
-                question: "<b>ด่านที่ 5:</b> หากเพื่อนในกลุ่มมีอาการ 'อาหารติดคอ สลักอาหาร' จนหายใจไม่ออก หน้าเริ่มเขียว นักเรียนควรทำอย่างไร?",
-                choices: ["🍭 A. เอาน้ำเย็นให้เพื่อนรีบดื่มตามเข้าไปเยอะๆ", "🍿 B. ให้เพื่อนยืนก้มหน้า แล้วใช้ฝ่ามือตบแรงๆ บริเวณกึ่งกลางหลัง (ระหว่างสะบัก)", "🧁 C. ปล่อยให้เพื่อนนั่งพักเฉยๆ เดี๋ยวมันก็หลุดเอง"],
+                question: "<b>ข้อ 4:</b> อาการใดต่อไปนี้ เป็นสัญญาณเตือนว่าระบบหายใจเริ่มมีปัญหาและควรไปพบแพทย์?",
+                choices: ["🍡 A. แน่นหน้าอก หายใจมีเสียงดังฟี้ดๆ และไอเรื้อรัง", "🍧 B. รู้สึกง่วงนอนเมื่อเปิดหนังสือเรียน", "🍰 C. จาม 1 ครั้งหลังดมพริกป่น"],
+                correct: 0,
+                feedbackOK: "ถูกต้อง! 🩺 อาการหายใจติดขัด หายใจมีเสียง ไอเรื้อรัง อาจเป็นอาการของโรคหอบหืดหรือปอดอักเสบ",
+                feedbackNo: "ลองคิดใหม่ซิเออ! ❌ การจามเพราะพริกเป็นกลไกปกติ ส่วนง่วงนอนเพราะหนังสือเรียนเป็นเรื่องปกติของเด็กๆ จ้า ฮ่าๆ"
+            },
+            {
+                question: "<b>ข้อ 5:</b> ถ้าเพื่อนกินขนมแล้ว 'สลักอาหาร' ติดคอจนหายใจไม่ออก หน้าเริ่มเขียว ควรทำอย่างไรเป็นอันดับแรก?",
+                choices: ["🍭 A. เอาน้ำเย็นจัดให้เพื่อนดื่มตามลงไปเยอะๆ", "🍿 B. ยืนด้านหลังก้มตัวเพื่อนลง แล้วใช้ฝ่ามือตบแรงๆ กึ่งกลางหลังระหว่างสะบัก", "🧁 C. สั่งให้เพื่อนวิ่งรอบห้องเผื่อขนมจะหลุด"],
                 correct: 1,
-                feedbackOK: "ถูกต้องปลอดภัย! 👏 การตบหลังแรงๆ (Back Blows) ช่วยสร้างแรงดันดันสิ่งแปลกปลอมออกจากทางเดินหายใจได้ทันที",
-                feedbackNo: "อันตรายมากนะครู! ❌ ห้ามให้ดื่มน้ำเด็ดขาดเพราะจะยิ่งอุดกั้นทางเดินหายใจ และห้ามปล่อยทิ้งไว้เพราะอาจขาดอากาศหายใจถึงชีวิตได้"
+                feedbackOK: "ยอดเยี่ยมปลอดภัย! 👏 การตบหลัง (Back Blows) ช่วยสร้างแรงดันลมในปอดดันอาหารที่อุดกั้นทางเดินหายใจให้ออกมาได้",
+                feedbackNo: "อันตรายมากนะครู! ❌ ห้ามดื่มน้ำเด็ดขาดเพราะจะยิ่งบล็อกทางเดินหายใจ และห้ามวิ่งเพราะจะยิ่งขาดอากาศหายใจเร็วขึ้นครับ"
             }
         ];
 
@@ -182,7 +179,6 @@
             document.getElementById('question-text').innerHTML = quizData[currentStage].question;
             document.getElementById('result-box').style.display = "none";
             document.getElementById('next-btn').style.display = "none";
-            document.getElementById('avatar-emoji').innerHTML = "🫁✨";
 
             const choicesContainer = document.getElementById('choices-container');
             choicesContainer.innerHTML = "";
@@ -199,24 +195,19 @@
         function selectAnswer(selectedIndex) {
             const resultBox = document.getElementById('result-box');
             const nextBtn = document.getElementById('next-btn');
-            const avatar = document.getElementById('avatar-emoji');
-            
-            // ปิดไม่ให้กดปุ่มช้อยส์ซ้ำหลังจากตอบแล้ว
             const buttons = document.querySelectorAll('.btn-choice');
+            
             buttons.forEach(btn => btn.disabled = true);
-
             resultBox.style.display = "block";
             nextBtn.style.display = "inline-block";
 
             if (selectedIndex === quizData[currentStage].correct) {
                 score++;
                 document.getElementById('score-text').innerText = score;
-                avatar.innerHTML = "🥰🎉";
                 resultBox.style.background = "#e8f5e9";
                 resultBox.style.color = "#2e7d32";
                 resultBox.innerHTML = quizData[currentStage].feedbackOK;
             } else {
-                avatar.innerHTML = "😱❌";
                 resultBox.style.background = "#ffebee";
                 resultBox.style.color = "#c62828";
                 resultBox.innerHTML = quizData[currentStage].feedbackNo;
@@ -228,25 +219,22 @@
             if (currentStage < quizData.length) {
                 loadStage();
             } else {
-                // จบเกม แสดงหน้าสรุป
                 document.getElementById('game-zone').style.display = "none";
                 document.getElementById('end-zone').style.display = "block";
                 document.getElementById('final-score').innerText = score;
                 
                 const evalText = document.getElementById('evaluation-text');
                 if (score === 5) {
-                    evalText.innerHTML = "🌟 ยอดเยี่ยมที่สุดเลย! หนูคือ <b>'สุดยอดผู้พิทักษ์ปอด'</b> รอบรู้และดูแลตัวเองได้ดีเยี่ยม!";
+                    evalText.innerHTML = "🌟 สุดยอดไปเลย! หนูคือ <b>'คุณหมอน้อยผู้พิทักษ์ปอด'</b> ดูแลระบบหายใจได้เยี่ยมยอด!";
                 } else if (score >= 3) {
-                    evalText.innerHTML = "👍 เก่งมากจ้า! หนูมีความรู้ในการดูแลระบบหายใจที่ดีเลย พยายามต่อไปนะคนเก่ง";
+                    evalText.innerHTML = "👍 เก่งมากจ้า! มีความรู้ในการดูแลตัวเองและเพื่อนๆ ได้ดีเลยนะ";
                 } else {
-                    evalText.innerHTML = "🥺 ไม่เป็นไรน้าา ลองกลับไปทบทวนบทเรียนสุขศึกษา แล้วมาท้าทายใหม่อีกรอบนะจ๊ะ ปอดเราเราต้องดูแล!";
+                    evalText.innerHTML = "🥺 ไม่เป็นไรน้า กลับไปทบทวนเรื่องสุขศึกษาอีกนิด แล้วกลับมาแก้มือใหม่นะจ๊ะ!";
                 }
             }
         }
 
-        // เริ่มเกมครั้งแรก
         loadStage();
     </script>
-
 </body>
 </html>
