@@ -1,240 +1,381 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เกมกล้องหน้าผู้พิทักษ์ปอด - สุขศึกษา ป.6</title>
-    
-    <!-- ดึงคลังโค้ดสำหรับเปิดกล้องหน้า (Face Tracking) และฟอนต์ไอติม -->
-    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-face-aframe.prod.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Itim&display=swap" rel="stylesheet">
+Build a complete HTML5 educational game called "Bubble Pop: Short Vowel Adventure".
 
-    <style>
-        body, button, h2, h3, p, div {
-            font-family: 'Itim', cursive !important;
-            box-sizing: border-box;
-        }
+Requirements:
 
-        body {
-            margin: 0;
-            overflow: hidden;
-            background: #000;
-        }
+Create the project using HTML, CSS, and JavaScript only.
+Everything should work offline.
+Responsive design for iPad, tablets, and desktop browsers.
+No external frameworks.
 
-        /* กล่องคำถามแบบโปร่งแสง ลอยทับบนกล้องหน้าจอ */
-        .quiz-overlay {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 450px;
-            background: rgba(255, 255, 255, 0.92);
-            padding: 20px;
-            border-radius: 25px;
-            border: 4px solid #ffb7b2;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            text-align: center;
-            z-index: 9999;
-        }
+--------------------------------------------------
+GAME THEME
+--------------------------------------------------
 
-        h2 { color: #ff6b81; font-size: 24px; margin: 0 0 5px 0; }
-        p { color: #4a4a4a; font-size: 17px; line-height: 1.4; margin: 10px 0; }
+An underwater adventure with bright cartoon graphics.
 
-        .score-badge {
-            background: #ff7675;
-            color: white;
-            padding: 3px 12px;
-            border-radius: 15px;
-            font-size: 14px;
-            display: inline-block;
-        }
+Characters:
+- Friendly Octopus Teacher
+- Shark Boss
+- Whale Boss
+- Magic Octopus Boss
+- Dolphins
+- Turtles
+- Tropical fish
+- Treasure chests
 
-        /* ปุ่มช้อยส์พาสเทล */
-        .btn-choice {
-            background: #ffb7b2;
-            color: #4a4a4a;
-            border: none;
-            padding: 12px 15px;
-            margin: 6px 0;
-            border-radius: 15px;
-            cursor: pointer;
-            font-size: 17px;
-            width: 100%;
-            text-align: left;
-            box-shadow: 0 4px 0 #e09d98;
-            display: block;
-        }
-        .btn-choice:active {
-            transform: translateY(4px);
-            box-shadow: 0 0px 0 #e09d98;
-        }
+--------------------------------------------------
+LEARNING OBJECTIVE
+--------------------------------------------------
 
-        #result-box {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 12px;
-            font-size: 16px;
-            display: none;
-            text-align: left;
-        }
+Practice Short Vowel Word Families
 
-        .btn-next {
-            background: #20bf6b;
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 50px;
-            font-size: 17px;
-            cursor: pointer;
-            margin-top: 10px;
-            box-shadow: 0 4px 0 #10ac84;
-        }
-    </style>
-</head>
-<body>
+-at
+cat
+bat
+hat
+rat
+mat
 
-    <!-- ระบบเปิดกล้องหน้าของ MindAR -->
-    <a-scene mindar-face xr-mode-ui="enabled: false" embedded>
-        <a-camera active="true" position="0 0 0" look-controls="enabled: false"></a-camera>
-        
-        <!-- คุณครูสามารถหาโมเดล 3D หน้ากาก หรือ ปอด มาแปะให้ลอยบนหน้าเด็กตรงนี้เพิ่มทีหลังได้ครับ -->
-        <a-entity mindar-face-target="anchorIndex: 168">
-            <!-- จุดนี้คือดาดฟ้าจมูก/ระหว่างคิ้ว ถ้ามีโมเดล 3D จะลอยตรงนี้ทันที -->
-        </a-entity>
-    </a-scene>
+-ap
+cap
+map
+tap
+nap
+gap
 
-    <!-- หน้าจอเกม (ลอยอยู่บนกล้องหน้า) -->
-    <div class="quiz-overlay">
-        <div id="game-zone">
-            <div class="score-badge">ด่านที่ <span id="stage-num">1</span>/5 | คะแนน: <span id="score-text">0</span></div>
-            <h2>📸 มองกล้องแล้วตอบคำถามกัน!</h2>
-            <p id="question-text">ข้อความคำถาม</p>
+-an
+fan
+pan
+man
+van
+can
 
-            <div id="choices-container"></div>
-            
-            <div id="result-box"></div>
-            <button class="btn-next" id="next-btn" style="display:none;" onclick="nextStage()">ด่านต่อไป ➡️</button>
-        </div>
+--------------------------------------------------
+HOME SCREEN
+--------------------------------------------------
 
-        <!-- หน้าสรุปตอนจบเกม -->
-        <div id="end-zone" style="display:none;">
-            <h2>🎉 สำเร็จภารกิจพิทักษ์ปอด!</h2>
-            <p style="font-size: 20px; margin: 0;">หนูได้คะแนนรวมทั้งหมด</p>
-            <h1 style="font-size: 50px; color: #ff6b81; margin: 5px 0;"><span id="final-score">0</span> / 5</h1>
-            <p id="evaluation-text">คำชม</p>
-            <button class="btn-next" onclick="location.reload()">เล่นใหม่อีกครั้ง 🔄</button>
-        </div>
-    </div>
+Animated ocean background.
 
-    <script>
-        // คลังคำถาม 5 ข้อวิชาสุขศึกษา ป.6
-        const quizData = [
-            {
-                question: "<b>ข้อ 1:</b> หากโรงเรียนมีค่าฝุ่น PM 2.5 สูงมาก พฤติกรรมใดเป็นการดูแลระบบหายใจที่ถูกต้องที่สุด?",
-                choices: ["🧁 A. ใส่หน้ากากอนามัย และงดเล่นกลางแจ้ง", "🍭 B. วิ่งเล่นสู้ฝุ่นเพื่อฝึกความอดทนของปอด", "🍿 C. ใช้มืออุดจมูกแล้วไปวิ่งเล่นปกติ"],
-                correct: 0,
-                feedbackOK: "ถูกต้องเลยครู! 🎉 หน้ากากอนามัยช่วยกรองฝุ่นจิ๋วไม่ให้ทำลายถุงลมปอดครับ",
-                feedbackNo: "ยังไม่ถูกน้า! ❌ ฝุ่น PM 2.5 เล็กมากทะลวงเข้ากระแสเลือดได้เลย ต้องหลบในอาคารและใส่แมสก์จ้า"
-            },
-            {
-                question: "<b>ข้อ 2:</b> หากคนในครอบครัวสูบบุหรี่ในบ้าน จะส่งผลเสียต่อปอดของนักเรียน (ผู้สูบบุหรี่มือสอง) อย่างไร?",
-                choices: ["🍦 A. ไม่เป็นไรเลยเพราะเราไม่ได้สูบเอง", "🍩 B. สารพิษจะเข้าไปทำลายถุงลมปอด เสี่ยงต่อโรคถุงลมโป่งพอง", "🍫 C. ทำให้ปอดแข็งแรงขึ้นเพราะชินกับควัน"],
-                correct: 1,
-                feedbackOK: "เก่งมาก! 🚬 ควันบุหรี่มือสองอันตรายมาก สารพิษทำลายปอดคนรอบข้างได้เหมือนคนสูบเองเลย",
-                feedbackNo: "ผิดเลยจ้า! ❌ ควันบุหรี่ไม่มีประโยชน์ มีแต่สารพิษที่จ้องทำลายระบบหายใจของเรานะ"
-            },
-            {
-                question: "<b>ข้อ 3:</b> การออกกำลังกายสม่ำเสมอ ส่งผลดีต่อ 'ระบบหายใจ' อย่างไรมากที่สุด?",
-                choices: ["🥞 A. ทำให้ปอดเล็กลงเรื่อยๆ", "🧋 B. ช่วยเพิ่มความจุของปอด และทำให้กะบังลมแข็งแรง", "🍮 C. ทำให้เราไม่ต้องหายใจตอนนอน"],
-                correct: 1,
-                feedbackOK: "ใช่เลย! 🏃‍♂️ ปอดจะขยายตัวได้ดี กะบังลมแข็งแรง ทำให้ร่างกายได้รับออกซิเจนเต็มที่ครับ",
-                feedbackNo: "แง ยังไม่ใช่น้า! ❌ การออกกำลังกายทำให้ปอดทำงานมีประสิทธิภาพขึ้น ไม่ใช่ทำให้ปอดเล็กลงจ้า"
-            },
-            {
-                question: "<b>ข้อ 4:</b> อาการใดต่อไปนี้ เป็นสัญญาณเตือนว่าระบบหายใจเริ่มมีปัญหาและควรไปพบแพทย์?",
-                choices: ["🍡 A. แน่นหน้าอก หายใจมีเสียงดังฟี้ดๆ และไอเรื้อรัง", "🍧 B. รู้สึกง่วงนอนเมื่อเปิดหนังสือเรียน", "🍰 C. จาม 1 ครั้งหลังดมพริกป่น"],
-                correct: 0,
-                feedbackOK: "ถูกต้อง! 🩺 อาการหายใจติดขัด หายใจมีเสียง ไอเรื้อรัง อาจเป็นอาการของโรคหอบหืดหรือปอดอักเสบ",
-                feedbackNo: "ลองคิดใหม่ซิเออ! ❌ การจามเพราะพริกเป็นกลไกปกติ ส่วนง่วงนอนเพราะหนังสือเรียนเป็นเรื่องปกติของเด็กๆ จ้า ฮ่าๆ"
-            },
-            {
-                question: "<b>ข้อ 5:</b> ถ้าเพื่อนกินขนมแล้ว 'สลักอาหาร' ติดคอจนหายใจไม่ออก หน้าเริ่มเขียว ควรทำอย่างไรเป็นอันดับแรก?",
-                choices: ["🍭 A. เอาน้ำเย็นจัดให้เพื่อนดื่มตามลงไปเยอะๆ", "🍿 B. ยืนด้านหลังก้มตัวเพื่อนลง แล้วใช้ฝ่ามือตบแรงๆ กึ่งกลางหลังระหว่างสะบัก", "🧁 C. สั่งให้เพื่อนวิ่งรอบห้องเผื่อขนมจะหลุด"],
-                correct: 1,
-                feedbackOK: "ยอดเยี่ยมปลอดภัย! 👏 การตบหลัง (Back Blows) ช่วยสร้างแรงดันลมในปอดดันอาหารที่อุดกั้นทางเดินหายใจให้ออกมาได้",
-                feedbackNo: "อันตรายมากนะครู! ❌ ห้ามดื่มน้ำเด็ดขาดเพราะจะยิ่งบล็อกทางเดินหายใจ และห้ามวิ่งเพราะจะยิ่งขาดอากาศหายใจเร็วขึ้นครับ"
-            }
-        ];
+Buttons:
+Start Game
+Choose Level
+How to Play
+Settings
 
-        let currentStage = 0;
-        let score = 0;
+The Octopus says:
+"Hello, friends!"
+"Let's find the word!"
 
-        function loadStage() {
-            document.getElementById('stage-num').innerText = currentStage + 1;
-            document.getElementById('score-text').innerText = score;
-            document.getElementById('question-text').innerHTML = quizData[currentStage].question;
-            document.getElementById('result-box').style.display = "none";
-            document.getElementById('next-btn').style.display = "none";
+--------------------------------------------------
+GAMEPLAY
+--------------------------------------------------
 
-            const choicesContainer = document.getElementById('choices-container');
-            choicesContainer.innerHTML = "";
+Each round:
 
-            quizData[currentStage].choices.forEach((choice, index) => {
-                const button = document.createElement('button');
-                button.className = "btn-choice";
-                button.innerHTML = choice;
-                button.onclick = () => selectAnswer(index);
-                choicesContainer.appendChild(button);
-            });
-        }
+Show one picture.
 
-        function selectAnswer(selectedIndex) {
-            const resultBox = document.getElementById('result-box');
-            const nextBtn = document.getElementById('next-btn');
-            const buttons = document.querySelectorAll('.btn-choice');
-            
-            buttons.forEach(btn => btn.disabled = true);
-            resultBox.style.display = "block";
-            nextBtn.style.display = "inline-block";
+Automatically pronounce the word.
 
-            if (selectedIndex === quizData[currentStage].correct) {
-                score++;
-                document.getElementById('score-text').innerText = score;
-                resultBox.style.background = "#e8f5e9";
-                resultBox.style.color = "#2e7d32";
-                resultBox.innerHTML = quizData[currentStage].feedbackOK;
-            } else {
-                resultBox.style.background = "#ffebee";
-                resultBox.style.color = "#c62828";
-                resultBox.innerHTML = quizData[currentStage].feedbackNo;
-            }
-        }
+Example:
 
-        function nextStage() {
-            currentStage++;
-            if (currentStage < quizData.length) {
-                loadStage();
-            } else {
-                document.getElementById('game-zone').style.display = "none";
-                document.getElementById('end-zone').style.display = "block";
-                document.getElementById('final-score').innerText = score;
-                
-                const evalText = document.getElementById('evaluation-text');
-                if (score === 5) {
-                    evalText.innerHTML = "🌟 สุดยอดไปเลย! หนูคือ <b>'คุณหมอน้อยผู้พิทักษ์ปอด'</b> ดูแลระบบหายใจได้เยี่ยมยอด!";
-                } else if (score >= 3) {
-                    evalText.innerHTML = "👍 เก่งมากจ้า! มีความรู้ในการดูแลตัวเองและเพื่อนๆ ได้ดีเลยนะ";
-                } else {
-                    evalText.innerHTML = "🥺 ไม่เป็นไรน้า กลับไปทบทวนเรื่องสุขศึกษาอีกนิด แล้วกลับมาแก้มือใหม่นะจ๊ะ!";
-                }
-            }
-        }
+Picture:
+Cat
 
-        loadStage();
-    </script>
-</body>
-</html>
+Audio:
+"Cat"
+
+Floating bubbles appear containing words.
+
+Example:
+
+cat
+cap
+fan
+map
+
+Player must pop the correct bubble.
+
+--------------------------------------------------
+CORRECT ANSWER
+--------------------------------------------------
+
++1 Score
+
++1 Star
+
+Bubble pop animation
+
+Sparkles
+
+Fish swim across screen
+
+Cheering sound
+
+Octopus randomly says:
+
+Great Job!
+
+Excellent!
+
+Awesome!
+
+--------------------------------------------------
+WRONG ANSWER
+--------------------------------------------------
+
+Bubble shakes
+
+Funny sound
+
+Message:
+
+Try Again!
+
+Correct bubble remains.
+
+--------------------------------------------------
+LEVELS
+--------------------------------------------------
+
+Level 1
+-at
+
+Level 2
+-ap
+
+Level 3
+-an
+
+Random order every play.
+
+--------------------------------------------------
+HUD
+--------------------------------------------------
+
+Top Left
+
+Stars
+
+Hearts
+
+Coins
+
+Top Right
+
+Score
+
+Timer
+
+Bottom
+
+Progress Bar
+
+--------------------------------------------------
+POWER UPS
+--------------------------------------------------
+
+Rainbow Bubble
+
++5 Seconds
+
+Star Bubble
+
+2x Score for 10 seconds
+
+Heart Bubble
+
+Restore one heart
+
+Turtle Shield
+
+Blocks one mistake
+
+Clock Bubble
+
+Slow bubbles
+
+Treasure Bubble
+
++10 Coins
+
++3 Stars
+
+Power-ups appear randomly.
+
+Only one active at a time.
+
+--------------------------------------------------
+COMBO SYSTEM
+--------------------------------------------------
+
+Five correct answers activate
+
+Ocean Hero Mode
+
+Effects:
+
+Triple score
+
+Slow bubbles
+
+Rainbow background
+
+Sea animals celebrate
+
+--------------------------------------------------
+BOSS BATTLES
+--------------------------------------------------
+
+Boss 1
+
+Friendly Shark
+
+Mission:
+
+Pop only words ending in -at
+
+30 seconds
+
+Boss loses health after each correct answer.
+
+Reward:
+
+AT Master Badge
+
+--------------------------------------------------
+
+Boss 2
+
+Whale
+
+Mission
+
+Pop only -ap words.
+
+Bubble waves move bubbles sideways.
+
+Reward
+
+AP Explorer Badge
+
+--------------------------------------------------
+
+Boss 3
+
+Magic Octopus
+
+Mission
+
+Pop only -an words.
+
+Ink clouds hide bubbles.
+
+Reward
+
+AN Champion Badge
+
+--------------------------------------------------
+FINAL SCREEN
+--------------------------------------------------
+
+Show
+
+Final Score
+
+Stars
+
+Coins
+
+Accuracy
+
+Badges
+
+Time
+
+Ranks
+
+15/15
+
+Gold Star Champion
+
+12-14
+
+Silver Star Explorer
+
+9-11
+
+Bronze Star Learner
+
+Below 9
+
+Keep Practicing
+
+--------------------------------------------------
+REWARDS
+--------------------------------------------------
+
+Fireworks
+
+Confetti
+
+Treasure Chest
+
+Victory Music
+
+Certificate
+
+The Octopus says:
+
+"Congratulations!"
+
+"You are a Short Vowel Champion!"
+
+--------------------------------------------------
+ACCESSIBILITY
+--------------------------------------------------
+
+Large buttons
+
+Large font
+
+Touch friendly
+
+Audio pronunciation
+
+Picture support
+
+Suitable for Grade 1–3
+
+--------------------------------------------------
+PROJECT STRUCTURE
+--------------------------------------------------
+
+Create
+
+index.html
+
+style.css
+
+script.js
+
+assets/images
+
+assets/audio
+
+assets/icons
+
+README.md
+
+--------------------------------------------------
+CODE QUALITY
+--------------------------------------------------
+
+Write clean modular JavaScript.
+
+Comment all major functions.
+
+Organize code for easy editing.
+
+Avoid duplicate code.
+
+Everything should run immediately by opening index.html.
